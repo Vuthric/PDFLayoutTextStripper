@@ -56,7 +56,7 @@ import org.apache.pdfbox.text.TextPositionComparator;
 public class PDFLayoutTextStripper extends PDFTextStripper {
 
     public static final boolean DEBUG = false;
-    public static final int OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT = 4;
+    public static final float OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT = 2.f;
 
     private double currentPageWidth;
     private TextPosition previousTextPosition;
@@ -224,7 +224,7 @@ class TextLine {
 
     public TextLine(int lineLength) {
         this.line = "";
-        this.lineLength = lineLength / PDFLayoutTextStripper.OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT;
+        this.lineLength = (int)(lineLength / PDFLayoutTextStripper.OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT);
         this.completeLineWithSpaces();
     }
 
@@ -402,7 +402,7 @@ class CharacterFactory {
         this.isCharacterAtTheBeginningOfNewLine = this.isCharacterAtTheBeginningOfNewLine(textPosition);
         this.isCharacterCloseToPreviousWord = this.isCharacterCloseToPreviousWord(textPosition);
         char character = this.getCharacterFromTextPosition(textPosition);
-        int index = (int)textPosition.getX() / PDFLayoutTextStripper.OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT;
+        int index = (int)(textPosition.getX() / PDFLayoutTextStripper.OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT);
         return new Character(character,
                              index,
                              isCharacterPartOfPreviousWord,
@@ -433,7 +433,7 @@ class CharacterFactory {
             return false;
         }
         double numberOfSpaces = this.numberOfSpacesBetweenTwoCharacters(previousTextPosition, textPosition);
-        return (numberOfSpaces > 1 && numberOfSpaces <= PDFLayoutTextStripper.OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT);
+        return numberOfSpaces < PDFLayoutTextStripper.OUTPUT_SPACE_CHARACTER_WIDTH_IN_PT;
     }
 
     private boolean isCharacterPartOfPreviousWord(final TextPosition textPosition) {
@@ -449,7 +449,7 @@ class CharacterFactory {
         double previousTextXPosition = textPosition1.getX();
         double previousTextWidth = textPosition1.getWidth();
         double previousTextEndXPosition = (previousTextXPosition + previousTextWidth);
-        double numberOfSpaces = Math.abs(Math.round(textPosition2.getX() - previousTextEndXPosition));
+        double numberOfSpaces = textPosition2.getX() - previousTextEndXPosition;
         return numberOfSpaces;
     }
 
